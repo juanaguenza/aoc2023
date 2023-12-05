@@ -38,23 +38,9 @@ func main() {
 		}
 		nums := input[1]
 		cardsNums[card_num_int] = nums
-		nums_split := strings.SplitAfter(nums, `|`)
 
-		winning_nums := nums_split[0]
-		my_nums := nums_split[1]
+		matching_nums := matchingNums(nums)
 
-		winning_nums_slice := strings.Fields(winning_nums)
-		my_nums_slice := strings.Fields(my_nums)
-
-		var matching_nums int
-
-		for _, my_num := range my_nums_slice {
-			for _, winning_num := range winning_nums_slice {
-				if my_num == winning_num {
-					matching_nums++
-				}
-			}
-		}
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -70,6 +56,11 @@ func main() {
 		for i, card := range cards {
 			nums, ok := cardsNums[card]
 			if ok {
+				matching_nums := matchingNums(nums)
+				winner = true
+				// Remove that card from our current stash
+				cards = append(cards[:i], cards[i+1:]...)
+
 			} else {
 				winner = false
 			}
@@ -80,4 +71,22 @@ func main() {
 
 // Returns an int indicating the amount of matching numbers
 func matchingNums(str string) int {
+	nums_split := strings.SplitAfter(str, `|`)
+
+	winning_nums := nums_split[0]
+	my_nums := nums_split[1]
+
+	winning_nums_slice := strings.Fields(winning_nums)
+	my_nums_slice := strings.Fields(my_nums)
+
+	var matching_nums int
+
+	for _, my_num := range my_nums_slice {
+		for _, winning_num := range winning_nums_slice {
+			if my_num == winning_num {
+				matching_nums++
+			}
+		}
+	}
+	return matching_nums
 }
