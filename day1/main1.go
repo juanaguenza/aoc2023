@@ -12,7 +12,6 @@ import (
 func main() {
 	// Open our txt file containing our input
 	file, err := os.Open("input.txt")
-
 	if err != nil {
 		log.Fatal(err)
 	}
