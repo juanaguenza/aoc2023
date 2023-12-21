@@ -2,11 +2,14 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 )
+
+var totalProcessedCards int
 
 func main() {
 	// Open our .txt file containing our input
@@ -18,11 +21,11 @@ func main() {
 	// Create a new scanner to read each line in our input file
 	scanner := bufio.NewScanner(file)
 
-	// Keep track of all our cards
-	var cards []int
-
 	// Create a map to keep track of each card
-	cardsNums := make(map[int]string, 188)
+	cardsNums := make(map[int]int, 188)
+
+	// Keep track of our cards that are yet to be processed
+	var cards []int
 
 	// Read line by line
 	for scanner.Scan() {
@@ -37,36 +40,42 @@ func main() {
 			log.Fatal(err)
 		}
 		nums := input[1]
-		cardsNums[card_num_int] = nums
 
 		matching_nums := matchingNums(nums)
+		cardsNums[card_num_int] = matching_nums // key: card ID value: # of matches
 
-		if err != nil {
-			log.Fatal(err)
-		}
+		// Increment the amount of cards we have processed
+		totalProcessedCards++
+
+		// Add the matching cards to our list of cards now
 		for i := 0; i < matching_nums; i++ {
 			card_num_int++
 			cards = append(cards, card_num_int)
 		}
+		// fmt.Println(cards)
 	}
-	// For our remaining cards in cards
-	winner := true
-	var resulting_cards []int
-	for winner || len(cards) > 0 {
-		for i, card := range cards {
-			nums, ok := cardsNums[card]
-			if ok {
-				matching_nums := matchingNums(nums)
-				winner = true
-				// Remove that card from our current stash
-				cards = append(cards[:i], cards[i+1:]...)
 
-			} else {
-				winner = false
-			}
+	// Now we should have a dictionary of {cardNum : matches}... We need to process those
 
+	for len(cards) > 0 {
+		// Get the first card from the list -> Process it
+		cardNum := cards[0]
+		matches := cardsNums[cardNum]
+
+		// Loop through and add to cards...
+		for i := 0; i < matches; i++ {
+			cardNum++
+			cards = append(cards, cardNum)
 		}
+
+		// Delete the first element of our slice (the current card we are processing)
+		cards = cards[1:]
+
+		// Increment amount of processed cards
+		totalProcessedCards++
 	}
+	// Print our result
+	fmt.Println("Total Processed Cards:", totalProcessedCards)
 }
 
 // Returns an int indicating the amount of matching numbers
